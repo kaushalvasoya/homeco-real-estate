@@ -18,7 +18,9 @@ const MONGO_URI = process.env.MONGO_URI || 'your_mongo_uri_here';
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'https://homeco-real-estate.vercel.app/'
+    
   ],
   credentials: true
 }));
