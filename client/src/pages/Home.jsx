@@ -9,6 +9,9 @@ import Listings from '../components/Listings';
 import TeamTestimonials from '../components/TeamTestimonials';
 import ContactSection from '../components/ContactSection';
 import Footer from '../components/Footer';
+import { api } from '../utils/api';
+
+
 
 // same pattern you used before for API base
 // shared helper in each file for now

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
+import { api } from '../utils/api';
 
 const API_BASE =
   typeof window !== 'undefined' && window.location.hostname === 'localhost'
