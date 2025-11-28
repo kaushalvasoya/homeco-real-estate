@@ -1,0 +1,475 @@
+/* client/src/index.css
+   Dark theme + homepage styles (ready to paste)
+   - Avoids Tailwind slash opacity shorthand in @apply
+   - Uses explicit rgba background-color where needed
+*/
+
+/* Tailwind directives */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Root colors */
+:root{
+  --bg-dark: #071028;
+  --panel: #0b1a2b;
+  --muted: #0f2333;
+  --accent: #6d28d9;
+  --accent-2: #7c3aed;
+  --glass-weak: rgba(255,255,255,0.06);
+  --glass-strong: rgba(255,255,255,0.12);
+  --text-soft: rgba(255,255,255,0.90);
+}
+
+/* Base page */
+html, body, #root { height: 100%; }
+body {
+  @apply text-gray-100 antialiased;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: linear-gradient(180deg, #041024 0%, #07182a 40%, #081726 100%);
+  color: var(--text-soft);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* container helper */
+.container-lg { @apply max-w-7xl mx-auto px-6; }
+
+/* NAV */
+.navbar {
+  @apply flex items-center justify-between py-6;
+}
+.brand {
+  @apply text-3xl font-semibold text-indigo-400;
+  font-family: 'Playfair Display', serif;
+}
+
+/* shared nav link style */
+.nav-link {
+  @apply text-base text-gray-200 hover:text-white/90 font-medium transition-all;
+}
+
+.nav-link-active {
+  @apply text-white relative;
+}
+
+.nav-link-active::after {
+  content: '';
+  @apply absolute left-1/2 -bottom-1 w-2 h-2 bg-indigo-400 rounded-full -translate-x-1/2;
+}
+
+/* HERO */
+.hero {
+  @apply relative overflow-hidden rounded-3xl shadow-2xl my-8;
+  min-height: 520px;
+  background-color: rgba(4,8,16,0.2);
+}
+
+/* background image layer */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+  filter: saturate(1.05) contrast(0.95);
+}
+
+/* overlay */
+.hero-overlay {
+  position:absolute;
+  inset:0;
+  background: linear-gradient(180deg, rgba(4,8,16,0.45) 0%, rgba(4,8,16,0.35) 40%, rgba(4,8,16,0.15) 100%);
+  z-index: 5;
+}
+
+/* inner */
+.hero-inner {
+  @apply relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center;
+  padding: 48px;
+}
+.hero-left { @apply lg:col-span-7 text-white; }
+.kicker { @apply text-sm font-semibold text-indigo-300 mb-2; }
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-weight:700;
+  font-size: clamp(28px, 4vw, 54px);
+  line-height: 1.02;
+  color: #ffffff;
+  text-shadow: 0 8px 24px rgba(5,10,20,0.5);
+}
+.hero-sub { @apply mt-4 text-sm text-gray-200 max-w-xl; }
+.hero-cta { @apply mt-6 inline-flex items-center gap-4; }
+
+/* CTA button */
+.btn { @apply inline-flex items-center justify-center px-5 py-3 rounded-full font-medium shadow-lg; }
+.btn-primary {
+  background: linear-gradient(90deg,var(--accent),var(--accent-2));
+  color: white;
+  box-shadow: 0 8px 30px rgba(109,40,217,0.18);
+}
+
+/* hero-card: floating preview
+   Use explicit CSS for glass/background to avoid Tailwind shorthand issues.
+*/
+.hero-card {
+  @apply bg-white/10 backdrop-blur-xl rounded-xl shadow-xl p-4 flex items-center gap-4;
+  width: 340px;           /* FIXED compact width */
+  height: 110px;          /* Consistent size */
+  border: 1px solid rgba(255,255,255,0.1);
+  position: absolute;
+  bottom: 1px;           /* Lift card visually */
+  left: 40px;             /* Adjust placement */
+}
+.hero-card img {
+  @apply w-20 h-16 object-cover rounded-md;
+}
+
+
+/* Right column feature panels (glass) */
+@media (min-width: 1024px) {
+  aside.feature-panel { @apply lg:col-span-5; }
+}
+
+/* Create a glass/frosted class without using problematic Tailwind shorthand */
+.floating {
+  border-radius: 14px;
+  padding: 1rem;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  background-color: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 18px 40px rgba(2,6,12,0.55);
+  color: #081026;
+}
+
+/* FEATURES row */
+.features { @apply py-12; }
+.feature-grid { @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6; }
+
+/* Avoid using bg-white/3 - use explicit rgba */
+.feature {
+  @apply rounded-2xl p-6 text-center;
+  background-color: rgba(255,255,255,0.02); /* subtle translucent */
+  border: 1px solid rgba(255,255,255,0.03);
+  
+}
+.feature {
+  @apply bg-white/5 backdrop-blur-md rounded-2xl p-6 text-center shadow-lg;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #f0f0f5;            /* White-ish text */
+}
+.feature div {
+  color: #e6e6e6 !important; /* Ensure subtitle is bright */
+}
+
+/* LISTINGS */
+.listings { @apply py-12; }
+.card {
+  @apply rounded-2xl shadow p-4;
+  background-color: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.03);
+}
+.listing-img { @apply w-full h-44 object-cover rounded-lg; }
+
+/* TEAM - responsive grid; horizontal on md+ */
+.team { @apply py-12; }
+.team-grid { @apply grid grid-cols-1 gap-6; }
+@media (min-width: 768px) {
+  .team-grid { @apply grid grid-cols-3 gap-6; } /* 3 across on md+ */
+}
+.team-card {
+  @apply rounded-2xl p-8 text-center;
+  background-color: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.03);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.team-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 9999px;
+  object-fit: cover;
+  border: 4px solid rgba(255,255,255,0.06);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 18px rgba(124,58,237,0.06) inset;
+}
+
+/* CTA section */
+.cta {
+  @apply rounded-2xl p-10 mt-8 shadow-lg;
+  background: linear-gradient(90deg, rgba(109,40,217,0.12), rgba(124,58,237,0.06));
+}
+
+/* FOOTER */
+.site-footer {
+  @apply mt-12 p-12 rounded-t-2xl;
+  background: linear-gradient(180deg, rgba(4,7,15,0.85), rgba(4,7,15,0.95));
+  color: #c7d2fe;
+}
+
+/* Small helpers */
+.small-muted { color: rgba(255,255,255,0.6); font-size: 0.9rem; }
+.kicker { @apply text-sm font-semibold text-indigo-300; }
+
+/* Utility tweaks */
+.rounded-3xl { border-radius: 1rem; }
+
+/* Accessibility helpers */
+a { @apply underline-offset-2; }
+.button-shadow { box-shadow: 0 10px 30px rgba(7,10,25,0.55); }
+
+/* End */
+
+
+/* --- paste this at end of client/src/index.css --- */
+
+/* motion helpers */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fadeUp 700ms cubic-bezier(.2,.9,.2,1) both; }
+.animate-fade-up.delay-100 { animation-delay: 120ms; }
+
+/* GLASS / BLUR cards (dark theme friendly) */
+.glass-card {
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 28px;
+  border-radius: 16px;
+  color: #e7eef8;
+  box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+}
+
+/* input in glass */
+.glass-input {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.04);
+  color: #e6eef8;
+}
+
+/* floating small preview card on hero
+   - smaller, anchored near bottom-left
+   - responsive adjustments */
+.hero-card.floating {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 420px;            /* reduced width */
+  max-width: calc(100% - 80px);
+  padding: 12px 16px;
+  position: absolute;
+  left: 42px;              /* slightly inset from left */
+  bottom: 32px;            /* attach to bottom of hero */
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.45);
+  color: #f1f6fb;
+  transform: translateY(0);
+}
+
+/* ensure image in preview has fixed size */
+.hero-card.floating img { width: 72px; height: 56px; object-fit:cover; border-radius:6px; }
+
+/* right side floating panels styling */
+.feature.floating {
+  padding: 22px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.05);
+  color: #e7eef8;
+  box-shadow: 0 12px 28px rgba(2,6,23,0.6);
+}
+
+/* feature row cards below hero - increase contrast and light text */
+.feature-grid .feature {
+  background: rgba(255,255,255,0.03); /* subtle */
+  border: 1px solid rgba(255,255,255,0.04);
+  color: #e7eef8;
+  box-shadow: 0 12px 28px rgba(3,7,20,0.6);
+}
+
+/* TEAM: horizontal row on large screens, stacked on small */
+.team-row {
+  display: block;
+  gap: 20px;
+}
+@media(min-width:900px){
+  .team-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+  }
+  .team-card { flex: 1 1 28%; margin: 0 10px; }
+}
+
+/* team card */
+.team-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 28px;
+  border-radius: 14px;
+  text-align: center;
+  color: #e7eef8;
+  box-shadow: 0 20px 40px rgba(2,6,23,0.65);
+}
+.team-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 999px;
+  object-fit: cover;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+  border: 3px solid rgba(255,255,255,0.06);
+}
+
+/* listings card tweaks for dark theme */
+.listing-img { border-radius: 10px; }
+.card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  color: #e7eef8;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+}
+
+/* CTA gradient tweaks in dark theme */
+.cta { background: linear-gradient(90deg, rgba(75,55,188,0.9), rgba(99,102,241,0.9)); }
+
+/* small helpers */
+.icon-circle { width:42px;height:42px;border-radius:10px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center; }
+
+/* UX: make links a bit lighter on dark */
+a { color: #dbeafe; }
+.kicker { color: #bcd0ff; }
+.small-muted { color: #9fb0cf; }
+
+/* ensure hero container has some bottom padding when floating card is out */
+.hero { padding-bottom: 64px; }
+
+/* minor layout safety for smaller screens */
+@media(max-width:768px){
+  .hero-card.floating { position: static; width: 100%; margin-top: 18px; }
+  .feature-grid { grid-template-columns: repeat(2,1fr); gap:10px; }
+  .team-card { margin: 12px 0; }
+}
+
+/* accessibility: prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up { animation: none; transform:none; opacity:1; }
+}
+
+/* smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* simple fade up animation */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.6s cubic-bezier(.2,.9,.2,1) both;
+}
+
+/* hover tile for category cards */
+.hover-tile {
+  transition: transform 0.28s cubic-bezier(.2,.9,.2,1), box-shadow 0.28s ease, border-color 0.28s ease;
+}
+.hover-tile:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 22px 45px rgba(0,0,0,0.7);
+  border-color: rgba(129,140,248,0.7);
+}
+
+/* small fix: ensure glass inputs readable in dark admin and contact forms */
+.glass-input {
+  background: rgba(15,23,42,0.85);
+  border: 1px solid rgba(148,163,184,0.4);
+  color: #e5edff;
+}
+.glass-input::placeholder {
+  color: rgba(148,163,184,0.8);
+}
+
+/* ============= Scroll reveal animations ============= */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.7s ease-out,
+    transform 0.7s ease-out;
+}
+
+.reveal.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* small stagger delays (optional) */
+.reveal-delay-1 { transition-delay: 0.08s; }
+.reveal-delay-2 { transition-delay: 0.16s; }
+.reveal-delay-3 { transition-delay: 0.24s; }
+.reveal-delay-4 { transition-delay: 0.32s; }
+
+/* ============= Animated category cards ============= */
+
+.feature {
+  @apply bg-slate-900/60 rounded-2xl p-6 text-center border border-white/10
+    transition-transform duration-300 ease-out;
+}
+
+/* hover state for category cards */
+.feature:hover {
+  @apply -translate-y-1 shadow-lg shadow-indigo-500/30 border-indigo-400/60;
+}
+
+/* ============= Skeleton loaders ============= */
+
+.skeleton-card {
+  @apply bg-slate-900/60 rounded-2xl p-4 border border-white/10 animate-pulse;
+}
+
+.skeleton-img {
+  @apply w-full h-44 rounded-xl bg-slate-800;
+}
+
+.skeleton-line {
+  @apply h-3 rounded bg-slate-800 mt-3;
+}
+
+/* Contact glass card */
+.contact-card {
+  @apply bg-white/5 border border-white/10 rounded-3xl shadow-2xl backdrop-blur-xl px-8 py-10 lg:px-12 lg:py-12;
+}
+
+/* Generic input + textarea style (if not already defined) */
+.input {
+  @apply w-full rounded-xl border border-white/10 bg-white/5 text-sm text-white placeholder:text-gray-400 px-4 py-2.5 outline-none transition;
+}
+
+.input-solid:focus {
+  @apply border-indigo-400 bg-white/10 ring-2 ring-indigo-500/40;
+}
+
+.admin-form input,
+.admin-form select,
+.admin-form textarea {
+  color: #e8e8e8 !important; /* light text */
+  background-color: rgba(255,255,255,0.03) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+}
+
+.admin-form input::placeholder,
+.admin-form textarea::placeholder {
+  color: rgba(255,255,255,0.45);
+}
