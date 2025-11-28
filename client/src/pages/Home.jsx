@@ -15,11 +15,11 @@ import { api } from '../utils/api';
 
 // same pattern you used before for API base
 // shared helper in each file for now
-const API_BASE =
-  import.meta.env.VITE_API_BASE ||
-  (typeof window !== 'undefined' && window.location.hostname === 'localhost'
-    ? 'http://localhost:5000'
-    : '');
+// const API_BASE =
+//   import.meta.env.VITE_API_BASE ||
+//   (typeof window !== 'undefined' && window.location.hostname === 'localhost'
+//     ? 'http://localhost:5000'
+//     : '');
 
 
 export default function Home() {
