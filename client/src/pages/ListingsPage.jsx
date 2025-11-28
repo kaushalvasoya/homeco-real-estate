@@ -4,15 +4,16 @@ import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Listings from '../components/Listings';
 import Footer from '../components/Footer';
+import { api } from '../utils/api';
 
-const API_BASE =
-  typeof window !== 'undefined' && window.location.hostname === 'localhost'
-    ? 'http://localhost:5000'
-    : '';
+// const API_BASE =
+//   typeof window !== 'undefined' && window.location.hostname === 'localhost'
+//     ? 'http://localhost:5000'
+//     : '';
 
-function api(path) {
-  return `${API_BASE}/api${path.startsWith('/') ? path : '/' + path}`;
-}
+// function api(path) {
+//   return `${API_BASE}/api${path.startsWith('/') ? path : '/' + path}`;
+// }
 
 export default function ListingsPage() {
   const [properties, setProperties] = useState([]);
