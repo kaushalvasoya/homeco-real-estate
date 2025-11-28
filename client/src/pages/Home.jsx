@@ -9,11 +9,23 @@ import Footer from '../components/Footer';
 import axios from 'axios';
 import { api } from '../utils/api';
 
+
+
+// same pattern you used before for API base
+// shared helper in each file for now
+// const API_BASE =
+//   import.meta.env.VITE_API_BASE ||
+//   (typeof window !== 'undefined' && window.location.hostname === 'localhost'
+//     ? 'http://localhost:5000'
+//     : '');
+
+
 export default function Home() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  // fetch properties
+   useEffect(() => {
     async function load() {
       try {
         setLoading(true);
@@ -29,40 +41,67 @@ export default function Home() {
     load();
   }, []);
 
+  
+  // scroll-reveal animations
+  useEffect(() => {
+    const elements = document.querySelectorAll('.reveal');
+    if (!elements.length) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('reveal-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    elements.forEach(el => observer.observe(el));
+    return () => observer.disconnect();
+  }, [properties.length]); // re-run once data arrives
+
   const featured = properties[0];
 
   return (
     <>
       <Navbar />
-      <main className="page-spacing">
-        <Hero
-          featured={featured}
-          backgroundImageUrl={
-            featured?.images?.[0]?.url || '/sample/hero.jpg'
-          }
-        />
-        <FeatureGrid />
-        <Listings properties={properties} loading={loading} />
-        <TeamTestimonials />
-        <div className="container-lg">
-          <div className="cta mt-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-semibold">
-                  Discover Your Perfect Property Match
-                </h3>
-                <p className="small-muted mt-2">
-                  We help you find the right home quickly and easily.
-                </p>
-              </div>
-              <div>
-                <button className="btn btn-primary">Get Started</button>
-              </div>
-            </div>
-          </div>
+      <main className="page-shell pb-16">
+        {/* HERO */}
+        <div className="reveal reveal-delay-1">
+          <Hero
+            featured={featured}
+            backgroundImageUrl={
+              featured?.images?.[0]?.url || '/sample/hero.jpg'
+            }
+          />
         </div>
+
+        {/* CATEGORY CARDS */}
+        <div className="reveal reveal-delay-2">
+          <FeatureGrid />
+        </div>
+
+        {/* LISTINGS + skeletons when loading */}
+        <div className="reveal reveal-delay-3">
+          <Listings properties={properties} loading={loading} />
+        </div>
+
+        {/* TEAM */}
+        <div className="reveal reveal-delay-4">
+          <TeamTestimonials />
+        </div>
+
+        {/* CONTACT */}
+        <ContactSection className="reveal reveal-delay-3" />
+
+
+        {/* FOOTER (can also fade in if you want) */}
         <Footer />
       </main>
     </>
   );
 }
+
