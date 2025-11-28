@@ -11,10 +11,13 @@ import ContactSection from '../components/ContactSection';
 import Footer from '../components/Footer';
 
 // same pattern you used before for API base
+// shared helper in each file for now
 const API_BASE =
-  typeof window !== 'undefined' && window.location.hostname === 'localhost'
+  import.meta.env.VITE_API_BASE ||
+  (typeof window !== 'undefined' && window.location.hostname === 'localhost'
     ? 'http://localhost:5000'
-    : '';
+    : '');
+
 
 export default function Home() {
   const [properties, setProperties] = useState([]);
@@ -95,7 +98,7 @@ export default function Home() {
         </div>
 
         {/* CONTACT */}
-<ContactSection className="reveal reveal-delay-3" />
+        <ContactSection className="reveal reveal-delay-3" />
 
 
         {/* FOOTER (can also fade in if you want) */}
