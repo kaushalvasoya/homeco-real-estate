@@ -1,48 +1,45 @@
 // client/src/pages/Home.jsx
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import FeatureGrid from '../components/FeatureGrid';
 import Listings from '../components/Listings';
 import TeamTestimonials from '../components/TeamTestimonials';
+import ContactSection from '../components/ContactSection';
 import Footer from '../components/Footer';
-import axios from 'axios';
 import { api } from '../utils/api';
-
-
-
-// same pattern you used before for API base
-// shared helper in each file for now
-// const API_BASE =
-//   import.meta.env.VITE_API_BASE ||
-//   (typeof window !== 'undefined' && window.location.hostname === 'localhost'
-//     ? 'http://localhost:5000'
-//     : '');
-
 
 export default function Home() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // fetch properties
-   useEffect(() => {
+  // fetch properties from backend
+  useEffect(() => {
+    let cancelled = false;
+
     async function load() {
       try {
-        setLoading(true);
         const res = await axios.get(api('/properties'));
-        setProperties(res.data || []);
+        if (!cancelled) {
+          setProperties(res.data || []);
+        }
       } catch (err) {
-        console.error('Home fetch error', err);
-        setProperties([]);
+        console.error('Failed to fetch properties', err);
+        if (!cancelled) setProperties([]);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
+
     load();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  
-  // scroll-reveal animations
+  // scroll reveal animations
   useEffect(() => {
     const elements = document.querySelectorAll('.reveal');
     if (!elements.length) return;
@@ -61,7 +58,7 @@ export default function Home() {
 
     elements.forEach(el => observer.observe(el));
     return () => observer.disconnect();
-  }, [properties.length]); // re-run once data arrives
+  }, [properties.length]); // re run once data arrives
 
   const featured = properties[0];
 
@@ -95,13 +92,13 @@ export default function Home() {
         </div>
 
         {/* CONTACT */}
-        <ContactSection className="reveal reveal-delay-3" />
+        <div className="reveal reveal-delay-3">
+          <ContactSection />
+        </div>
 
-
-        {/* FOOTER (can also fade in if you want) */}
+        {/* FOOTER */}
         <Footer />
       </main>
     </>
   );
 }
-
