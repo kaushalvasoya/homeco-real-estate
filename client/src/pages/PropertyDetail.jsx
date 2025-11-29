@@ -4,188 +4,182 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { api } from '../utils/api';
+import { api } from '../utils/api'; // ✅ shared backend helper
 
-
-export default function PropertyDetail(){
+export default function PropertyDetail() {
   const { id } = useParams();
-  const [prop, setProp] = useState(null);
+  const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    async function fetchOne() {
+    let cancelled = false;
+
+    async function loadProperty() {
       try {
         setLoading(true);
-        const res = await axios.get(`http://localhost:5000/api/properties/${id}`);
-        setProp(res.data);
-        setErr(null);
-      } catch (e) {
-        console.error(e);
-        setErr('Could not load property');
+        const res = await axios.get(api(`/properties/${id}`)); // ✅ goes to Render
+        if (!cancelled) {
+          setProperty(res.data);
+          setError(null);
+        }
+      } catch (err) {
+        console.error('Property detail fetch error', err);
+        if (!cancelled) {
+          setError('Could not load property');
+          setProperty(null);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
-    fetchOne();
-  }, [id]);
 
-  const phone = (prop?.contactPhone || '919876543210').replace(/\D/g, '');
-  const waText = encodeURIComponent(
-    `Hi, I am interested in your property: ${prop?.title || ''}`
-  );
+    if (id) loadProperty();
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
 
   return (
     <>
       <Navbar />
-      <main className="page-spacing">
-        {loading && (
-          <section className="container-lg py-12">
-            <div className="animate-pulse grid gap-6 lg:grid-cols-3">
-              <div className="lg:col-span-2 h-72 rounded-2xl bg-slate-800" />
-              <div className="h-72 rounded-2xl bg-slate-800" />
-            </div>
-          </section>
-        )}
 
-        {!loading && err && (
-          <section className="container-lg py-12">
-            <div className="card bg-red-800/40 border border-red-500/30">
-              <p className="text-red-100">{err}</p>
-              <Link to="/" className="mt-4 inline-block text-indigo-300">
+      <main className="page-spacing">
+        <section className="container-lg py-10">
+          {/* SKELETON */}
+          {loading && (
+            <div className="rounded-2xl bg-slate-900/70 border border-slate-800 p-10 animate-pulse">
+              <div className="h-8 w-1/3 bg-slate-700 rounded mb-6" />
+              <div className="h-72 bg-slate-800 rounded-xl mb-6" />
+              <div className="h-4 w-2/3 bg-slate-700 rounded mb-2" />
+              <div className="h-4 w-1/2 bg-slate-700 rounded mb-2" />
+            </div>
+          )}
+
+          {/* ERROR STATE */}
+          {!loading && error && (
+            <div className="rounded-2xl bg-slate-900/80 border border-slate-800 p-6 text-slate-100">
+              <div className="font-semibold mb-2">{error}</div>
+              <Link
+                to="/"
+                className="text-sm text-indigo-400 hover:text-indigo-300"
+              >
                 ← Back to home
               </Link>
             </div>
-          </section>
-        )}
+          )}
 
-        {!loading && prop && (
-          <>
-            {/* top hero image and info */}
-            <section className="container-lg py-10">
-              <div className="grid gap-8 lg:grid-cols-3">
-                <div className="lg:col-span-2">
-                  <div className="overflow-hidden rounded-3xl shadow-xl border border-[rgba(255,255,255,0.06)]">
-                    <img
-                      src={prop.images?.[0]?.url || '/sample/prop-1.jpg'}
-                      alt={prop.title}
-                      className="w-full h-[360px] object-cover"
-                    />
-                  </div>
+          {/* SUCCESS STATE */}
+          {!loading && !error && property && (
+            <div className="grid lg:grid-cols-12 gap-10">
+              {/* MAIN IMAGE */}
+              <div className="lg:col-span-7">
+                <div className="rounded-2xl overflow-hidden border border-slate-800 bg-slate-900/70">
+                  <img
+                    src={property.images?.[0]?.url || '/sample/prop-1.jpg'}
+                    alt={property.title}
+                    className="w-full h-80 object-cover"
+                  />
                 </div>
 
-                <aside className="glass-card">
-                  <div className="text-xs uppercase tracking-[0.15em] text-indigo-300">
-                    Property overview
+                {property.images && property.images.length > 1 && (
+                  <div className="mt-4 grid grid-cols-4 gap-3">
+                    {property.images.slice(1, 5).map((img, idx) => (
+                      <img
+                        key={idx}
+                        src={img.url}
+                        alt={`${property.title} ${idx + 2}`}
+                        className="h-20 w-full object-cover rounded-lg border border-slate-800"
+                      />
+                    ))}
                   </div>
-                  <h1 className="text-2xl font-semibold mt-2">{prop.title}</h1>
-                  <p className="small-muted mt-1">{prop.location}</p>
-
-                  <div className="mt-4 flex items-center justify-between">
-                    <div>
-                      <div className="text-sm small-muted">Price</div>
-                      <div className="text-2xl font-semibold text-indigo-300">
-                        ₹{prop.price ? Number(prop.price).toLocaleString() : 'NA'}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm small-muted">Area</div>
-                      <div className="font-semibold">
-                        {prop.area ? `${prop.area} sqft` : 'NA'}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap gap-2 text-xs">
-                    {prop.bedrooms && (
-                      <span className="px-3 py-1 rounded-full bg-slate-800 border border-slate-600">
-                        🛏 {prop.bedrooms} bedrooms
-                      </span>
-                    )}
-                    {prop.bathrooms && (
-                      <span className="px-3 py-1 rounded-full bg-slate-800 border border-slate-600">
-                        🛁 {prop.bathrooms} bathrooms
-                      </span>
-                    )}
-                    <span className="px-3 py-1 rounded-full bg-slate-800 border border-slate-600">
-                      ID: {prop._id?.slice(-6)}
-                    </span>
-                  </div>
-
-                  <div className="mt-6 flex gap-3">
-                    <a
-                      href={`https://wa.me/${phone}?text=${waText}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="btn btn-primary flex-1 justify-center"
-                    >
-                      WhatsApp seller
-                    </a>
-                    {prop.contactPhone && (
-                      <a
-                        href={`tel:${phone}`}
-                        className="btn flex-1 justify-center border border-slate-600 bg-slate-900/60"
-                      >
-                        Call now
-                      </a>
-                    )}
-                  </div>
-                </aside>
+                )}
               </div>
-            </section>
 
-            {/* details section */}
-            <section className="container-lg pb-12">
-              <div className="grid lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2">
-                  <div className="card">
-                    <h2 className="text-xl font-semibold mb-3">Description</h2>
-                    <p className="small-muted whitespace-pre-line">
-                      {prop.description || 'Description not provided.'}
-                    </p>
+              {/* RIGHT INFO COLUMN */}
+              <div className="lg:col-span-5 flex flex-col gap-6">
+                <div>
+                  <div className="text-xs uppercase tracking-[0.18em] text-indigo-300 mb-2">
+                    For sale
                   </div>
+                  <h1 className="text-3xl font-semibold text-white">
+                    {property.title}
+                  </h1>
+                  <p className="mt-2 text-sm text-slate-300">
+                    {property.location}
+                  </p>
+                </div>
 
-                  {prop.images && prop.images.length > 1 && (
-                    <div className="card mt-6">
-                      <h3 className="text-lg font-semibold mb-3">Gallery</h3>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        {prop.images.slice(1).map((img, idx) => (
-                          <img
-                            key={idx}
-                            src={img.url}
-                            alt={`Property ${idx + 2}`}
-                            className="w-full h-32 md:h-40 object-cover rounded-xl"
-                          />
-                        ))}
-                      </div>
+                <div className="rounded-2xl bg-slate-900/80 border border-slate-800 p-5 flex items-center justify-between">
+                  <div>
+                    <div className="text-xs uppercase text-slate-400">
+                      Price
                     </div>
-                  )}
+                    <div className="text-2xl font-semibold text-indigo-300 mt-1">
+                      ₹
+                      {property.price
+                        ? Number(property.price).toLocaleString()
+                        : '—'}
+                    </div>
+                  </div>
+                  <a
+                    href={`https://wa.me/${(property.contactPhone || '919876543210').replace(
+                      /\D/g,
+                      ''
+                    )}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn-primary text-sm px-5"
+                  >
+                    Contact on WhatsApp
+                  </a>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="card">
-                    <h3 className="text-lg font-semibold mb-2">Key info</h3>
-                    <ul className="space-y-2 text-sm small-muted">
-                      <li>Listed: {new Date(prop.createdAt || Date.now()).toLocaleDateString()}</li>
-                      <li>Contact: {prop.contactPhone || 'Not provided'}</li>
-                    </ul>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="rounded-xl bg-slate-900/80 border border-slate-800 p-4 text-sm text-slate-200">
+                    <div className="text-xs uppercase text-slate-400">
+                      Bedrooms
+                    </div>
+                    <div className="mt-1 text-lg font-semibold">
+                      {property.bedrooms || '—'}
+                    </div>
                   </div>
-
-                  <div className="card">
-                    <h3 className="text-lg font-semibold mb-2">Back to listings</h3>
-                    <p className="small-muted mb-3">
-                      Want to keep exploring more properties in your area
-                    </p>
-                    <Link to="/" className="btn btn-primary w-full justify-center">
-                      View all listings
-                    </Link>
+                  <div className="rounded-xl bg-slate-900/80 border border-slate-800 p-4 text-sm text-slate-200">
+                    <div className="text-xs uppercase text-slate-400">
+                      Bathrooms
+                    </div>
+                    <div className="mt-1 text-lg font-semibold">
+                      {property.bathrooms || '—'}
+                    </div>
+                  </div>
+                  <div className="rounded-xl bg-slate-900/80 border border-slate-800 p-4 text-sm text-slate-200">
+                    <div className="text-xs uppercase text-slate-400">
+                      Area
+                    </div>
+                    <div className="mt-1 text-lg font-semibold">
+                      {property.area ? `${property.area} sqft` : '—'}
+                    </div>
                   </div>
                 </div>
+
+                {property.description && (
+                  <div className="rounded-2xl bg-slate-900/80 border border-slate-800 p-5 text-sm text-slate-200 leading-relaxed">
+                    {property.description}
+                  </div>
+                )}
+
+                <Link
+                  to="/listings"
+                  className="text-sm text-slate-300 hover:text-white"
+                >
+                  ← Back to all listings
+                </Link>
               </div>
-            </section>
-          </>
-        )}
+            </div>
+          )}
+        </section>
       </main>
+
       <Footer />
     </>
   );
