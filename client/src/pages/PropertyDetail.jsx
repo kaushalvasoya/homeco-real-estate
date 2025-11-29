@@ -4,7 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { api } from '../utils/api'; // ✅ shared backend helper
+import { api } from '../utils/api'; // ✅ use shared API helper
 
 export default function PropertyDetail() {
   const { id } = useParams();
@@ -18,16 +18,14 @@ export default function PropertyDetail() {
     async function loadProperty() {
       try {
         setLoading(true);
-        const res = await axios.get(api(`/properties/${id}`)); // ✅ goes to Render
+        const res = await axios.get(api(`/properties/${id}`));
         if (!cancelled) {
           setProperty(res.data);
-          setError(null);
         }
       } catch (err) {
-        console.error('Property detail fetch error', err);
+        console.error(err);
         if (!cancelled) {
           setError('Could not load property');
-          setProperty(null);
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -46,7 +44,6 @@ export default function PropertyDetail() {
 
       <main className="page-spacing">
         <section className="container-lg py-10">
-          {/* SKELETON */}
           {loading && (
             <div className="rounded-2xl bg-slate-900/70 border border-slate-800 p-10 animate-pulse">
               <div className="h-8 w-1/3 bg-slate-700 rounded mb-6" />
@@ -56,7 +53,6 @@ export default function PropertyDetail() {
             </div>
           )}
 
-          {/* ERROR STATE */}
           {!loading && error && (
             <div className="rounded-2xl bg-slate-900/80 border border-slate-800 p-6 text-slate-100">
               <div className="font-semibold mb-2">{error}</div>
@@ -69,14 +65,16 @@ export default function PropertyDetail() {
             </div>
           )}
 
-          {/* SUCCESS STATE */}
           {!loading && !error && property && (
             <div className="grid lg:grid-cols-12 gap-10">
-              {/* MAIN IMAGE */}
+              {/* main media */}
               <div className="lg:col-span-7">
                 <div className="rounded-2xl overflow-hidden border border-slate-800 bg-slate-900/70">
                   <img
-                    src={property.images?.[0]?.url || '/sample/prop-1.jpg'}
+                    src={
+                      property.images?.[0]?.url ||
+                      '/sample/prop-1.jpg'
+                    }
                     alt={property.title}
                     className="w-full h-80 object-cover"
                   />
@@ -96,7 +94,7 @@ export default function PropertyDetail() {
                 )}
               </div>
 
-              {/* RIGHT INFO COLUMN */}
+              {/* info column */}
               <div className="lg:col-span-5 flex flex-col gap-6">
                 <div>
                   <div className="text-xs uppercase tracking-[0.18em] text-indigo-300 mb-2">
@@ -116,10 +114,7 @@ export default function PropertyDetail() {
                       Price
                     </div>
                     <div className="text-2xl font-semibold text-indigo-300 mt-1">
-                      ₹
-                      {property.price
-                        ? Number(property.price).toLocaleString()
-                        : '—'}
+                      ₹{property.price ? Number(property.price).toLocaleString() : '—'}
                     </div>
                   </div>
                   <a
@@ -184,3 +179,4 @@ export default function PropertyDetail() {
     </>
   );
 }
+
