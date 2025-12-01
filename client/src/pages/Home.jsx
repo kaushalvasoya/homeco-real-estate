@@ -11,17 +11,6 @@ import ContactSection from '../components/ContactSection';
 import Footer from '../components/Footer';
 import { api } from '../utils/api';
 
-
-
-// same pattern you used before for API base
-// shared helper in each file for now
-const API_BASE =
-  import.meta.env.VITE_API_BASE ||
-  (typeof window !== 'undefined' && window.location.hostname === 'localhost'
-    ? 'http://localhost:5000'
-    : '');
-
-
 export default function Home() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +22,6 @@ export default function Home() {
     async function load() {
       try {
         const res = await axios.get(api('/properties'));
-
         if (!cancelled) {
           setProperties(res.data || []);
         }
@@ -46,7 +34,9 @@ export default function Home() {
     }
 
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // scroll-reveal animations
@@ -104,8 +94,7 @@ export default function Home() {
         {/* CONTACT */}
         <ContactSection className="reveal reveal-delay-3" />
 
-
-        {/* FOOTER (can also fade in if you want) */}
+        {/* FOOTER */}
         <Footer />
       </main>
     </>
