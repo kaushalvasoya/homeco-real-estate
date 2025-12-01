@@ -14,20 +14,32 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'your_mongo_uri_here';
 
-// Middleware
-app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'https://homeco-real-estate.vercel.app/'
-    
-  ],
-  credentials: true
-}));
+// -------- CORS (simple, allow all origins) --------
+// You are using token in headers, not cookies, so this is safe.
+app.use(cors());
+
+// If later you want to restrict it, you can switch to:
+//
+// const allowedOrigins = [
+//   'http://localhost:5173',
+//   'http://localhost:3000',
+//   'https://homeco-real-estate.vercel.app',
+// ];
+//
+// app.use(cors({
+//   origin(origin, callback) {
+//     if (!origin || allowedOrigins.includes(origin)) {
+//       return callback(null, true);
+//     }
+//     return callback(null, false);
+//   },
+// }));
+
+// Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
+// -------- Routes --------
 app.use('/api/auth', authRoutes);
 app.use('/api/properties', propertyRoutes);
 app.use('/api/contact', contactRouter);
@@ -36,10 +48,11 @@ app.get('/', (req, res) => {
   res.json({ ok: true, msg: 'API running' });
 });
 
-// Mongo connection and server start
+// -------- Mongo connection and server start --------
 mongoose.set('strictQuery', false);
 
-mongoose.connect(MONGO_URI)
+mongoose
+  .connect(MONGO_URI)
   .then(() => {
     console.log('Mongo connected');
     app.listen(PORT, () => {
@@ -49,3 +62,4 @@ mongoose.connect(MONGO_URI)
   .catch((err) => {
     console.error('Mongo error', err);
   });
+
