@@ -21,6 +21,7 @@ export default function Home() {
 
     async function load() {
       try {
+        // ✅ use shared api() helper
         const res = await axios.get(api('/properties'));
         if (!cancelled) {
           setProperties(res.data || []);
