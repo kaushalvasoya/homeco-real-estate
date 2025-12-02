@@ -1,21 +1,22 @@
 // client/src/utils/api.js
 
-// Base URL for the API
-// 1) Locally: http://localhost:5000
-// 2) In production: https://homeco-real-estate.onrender.com
-// 3) If VITE_API_BASE is set, that wins (for flexibility)
+// Single source of truth for backend URL.
+// - On localhost: use your local Node server.
+// - Everywhere else (Vercel, etc): use the Render API.
+//
+// We IGNORE VITE_API_BASE here on purpose so that
+// misconfigured env vars cannot break production.
 
 export const API_BASE =
-  import.meta.env.VITE_API_BASE ||
-  (typeof window !== 'undefined' && window.location.hostname === 'localhost'
+  typeof window !== 'undefined' && window.location.hostname === 'localhost'
     ? 'http://localhost:5000'
-    : 'https://homeco-real-estate.onrender.com');
+    : 'https://homeco-real-estate.onrender.com';
 
-// Helper to build full API URL
+// Helper to build the full API URL
 export function api(path) {
-  const base = API_BASE.replace(/\/+$/, ''); // remove trailing slashes
+  const base = API_BASE.replace(/\/+$/, ''); // trim trailing slashes
 
-  // Ensure path starts with /api
+  // Ensure we always prefix with /api
   const clean = path.startsWith('/api')
     ? path
     : `/api${path.startsWith('/') ? path : '/' + path}`;
