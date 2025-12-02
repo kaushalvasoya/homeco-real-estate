@@ -1,21 +1,26 @@
 // client/src/utils/api.js
 
-// Decides which backend to call
-// - Local dev: http://localhost:5000
-// - Production: https://homeco-real-estate.onrender.com
-export const API_BASE =
-  typeof window !== 'undefined' && window.location.hostname === 'localhost'
+// Very explicit helper: always returns a full backend URL.
+// - On localhost: uses http://localhost:5000
+// - On Vercel (or any other host): uses your Render API
+export function api(path = '') {
+  const isLocal =
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1');
+
+  const BASE = isLocal
     ? 'http://localhost:5000'
     : 'https://homeco-real-estate.onrender.com';
 
-export function api(path) {
-  const base = API_BASE.replace(/\/+$/, ''); // remove trailing slash
+  // Ensure path starts with a single slash
+  let clean = path.startsWith('/') ? path : `/${path}`;
 
-  if (!path) return `${base}/api`;
+  // Avoid double `/api/api/...`
+  if (clean.startsWith('/api/')) {
+    clean = clean.slice(4); // remove leading "/api"
+  }
 
-  const clean = path.startsWith('/api')
-    ? path
-    : `/api${path.startsWith('/') ? path : '/' + path}`;
-
-  return `${base}${clean}`;
+  // Final URL: BASE + /api + clean-path
+  return `${BASE}/api${clean}`;
 }
